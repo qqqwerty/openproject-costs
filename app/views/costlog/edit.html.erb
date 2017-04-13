@@ -75,6 +75,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                        data: { :'remote-field-key' => 'cost_type_id' }
                      } %></p>
       </div>
+      <% if User.current.allowed_to? :log_costs, @project %>
+        <div class="form--field">
+        <%= f.select :category,
+                     [
+                      ['Su užsakovu atsiskaitytas biudžetas', 1],
+                      ['Faktiškai įvykdytas biudžetas', 2]
+                     ],
+                     { prompt: true },
+                     {
+                       required: true,
+                       class: 'remote-field--input',
+                       data: { :'request-key' => 'category' }
+                     } %></p>
+        </div>
+      <% else %>
+        <%= f.hidden_field :category, value: 1 %>
+      <% end %>
       <div class="form--field">
         <% if @cost_entry.cost_type.nil? %>
             <%= f.text_field :units, size: 6, required: true %>

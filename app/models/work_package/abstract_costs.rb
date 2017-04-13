@@ -41,7 +41,7 @@ class WorkPackage
         .sum(costs_value)
         .to_f
     end
-
+    
     ##
     # The model on which the costs calculations are based.
     # Can be any model which has the fields `overridden_costs` and `costs`

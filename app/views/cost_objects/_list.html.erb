@@ -35,16 +35,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <tr>
           <%= sort_header_tag("id", :caption => '#', :default_order => 'desc') %>
           <%= sort_header_tag("subject", :caption => CostObject.human_attribute_name(:subject)) %>
-          <th class="currency">
+          <th>
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  <%= CostObject.human_attribute_name(:budget) %>
+                  Gautas
                 </span>
               </div>
             </div>
           </th>
-          <th class="currency">
+          <th>
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -53,7 +53,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th class="currency">
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  Likęs
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= CostObject.human_attribute_name(:budget) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                    Įgyvendintas
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -62,6 +89,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  Balansas
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  Procentais
+                </span>
+              </div>
+            </div>
           <th>
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
@@ -83,39 +127,99 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         </tr>
       </thead>
       <tbody>
-        <% total_budget = BigDecimal.new("0"); labor_budget = BigDecimal.new("0"); material_budget = BigDecimal.new("0"); spent = BigDecimal.new("0") %>
+        <%
+          total_budget = BigDecimal.new("0")
+          total_material_budget = BigDecimal.new("0")
+          total_spent_material_budget = BigDecimal.new("0")
+          total_planned_budget = BigDecimal.new("0")
+          total_spent_planned_budget = BigDecimal.new("0")
+          total_balance = BigDecimal.new("0")
+          material_budget = BigDecimal.new("0")
+          spent_material_budget = BigDecimal.new("0")
+          material_budget_balance = BigDecimal.new("0")
+          planned_budget = BigDecimal.new("0")
+          spent_planned_budget = BigDecimal.new("0")
+          plannet_budget_balance = BigDecimal.new("0")
+          balance = BigDecimal.new("0")
+        %>
         <% cost_objects.each do |cost_object| %>
-          <%-
-            total_budget += cost_object.budget
-            labor_budget += cost_object.labor_budget
-            material_budget += cost_object.material_budget
-            spent += cost_object.spent
-          -%>
+          <%  if cost_object.got_overall_material_budget > 0 %>
+            <tr id="cost_object-<%= cost_object.id %>" class="<%= cost_object.css_classes %>">
+            <%
+                total_budget += cost_object.got_overall_material_budget
+            %>
+            <td><%= link_to cost_object.id, cost_object_path(cost_object.id) %></td>
+            <%= content_tag(:td, link_to(h(cost_object.subject), cost_object_path(cost_object.id)), :class => 'subject') %>
+
+            <%= content_tag(:td, number_to_currency(cost_object.got_overall_material_budget, unit: "", :precision => 2), :class => 'currency') %>
+            <td>-</td> 
+            <td>-</td> 
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <% end %>
         <% end %>
-        
         <% cost_objects.each do |cost_object| %>
-        <tr id="cost_object-<%= cost_object.id %>" class="<%= cost_object.css_classes %>">
-          <td><%= link_to cost_object.id, cost_object_path(cost_object.id) %></td>
-          <%= content_tag(:td, link_to(h(cost_object.subject), cost_object_path(cost_object.id)), :class => 'subject') %>
-          <%= content_tag(:td, number_to_currency(cost_object.budget, :precision => 2), :class => 'currency') %>
-          <%= content_tag(:td, number_to_currency(cost_object.spent, :precision => 2), :class => 'currency') %>
-          <%= content_tag(:td, number_to_currency(cost_object.budget - cost_object.spent, :precision => 2), :class => 'currency') %>
-          <%= content_tag(:td, number_with_precision(cost_object.budget/total_budget * 100, :precision => 2) + '%') %>
-          <%= content_tag(:td, extended_progress_bar(cost_object.budget_ratio, :legend => "#{cost_object.budget_ratio}")) %>
-        </tr>
+          <% if cost_object.got_overall_material_budget <= 0 %>
+            <tr id="cost_object-<%= cost_object.id %>" class="<%= cost_object.css_classes %>">
+              <%
+                material_budget = cost_object.got_material_subbudget
+                spent_material_budget = cost_object.spent_material_subbudget
+                material_budget_balance = material_budget - spent_material_budget
+                planned_budget = cost_object.planned_material_subbudget
+                spent_planned_budget = cost_object.spent_planned_material_subbudget
+                plannet_budget_balance = planned_budget - spent_planned_budget
+                balance = material_budget - spent_planned_budget
+
+                total_material_budget += material_budget
+                total_spent_material_budget += spent_material_budget
+                total_planned_budget += planned_budget
+                total_spent_planned_budget += spent_planned_budget
+                total_balance += balance
+              %>
+              <td><%= link_to cost_object.id, cost_object_path(cost_object.id) %></td>
+              <%= content_tag(:td, link_to(h(cost_object.subject), cost_object_path(cost_object.id)), :class => 'subject') %>
+              <%= content_tag(:td, number_to_currency(material_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(spent_material_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(material_budget_balance, unit: "", :precision => 2), bgcolor: (material_budget-spent_material_budget)!=0 ? "orange" : nil) %>
+              <%= content_tag(:td, number_to_currency(planned_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(spent_planned_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(plannet_budget_balance, unit: "", :precision => 2), bgcolor: (material_budget-spent_material_budget)<0 ? "orange" : nil) %>
+              <%= content_tag(:td, number_to_currency(balance, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_with_precision(balance/material_budget * 100, :precision => 2) + '%', bgcolor: balance/material_budget < 0.1 ? "orange" : nil) %>
+              <%= content_tag(:td, number_with_precision(material_budget/total_budget * 100, :precision => 2) + '%') %>
+              <%= content_tag(:td, extended_progress_bar(spent_material_budget/material_budget*100, :legend => "#{number_with_precision(spent_material_budget/material_budget*100, :precision => 2)}")) %>
+            </tr>
+          <% end %>
         <% end %>
         <% if cost_objects.length > 0 %>
         <tr>
           <td />
-          <td />
-          <td class="currency"><strong><%= number_to_currency( total_budget, :precision => 2) %></strong></td>
-          <td class="currency"><strong><%= number_to_currency( spent, :precision => 2) %></strong></td>
-          <td class="currency"><strong><%= number_to_currency( total_budget - spent, :precision => 2) %></strong></td>
+          <td> Suma </td>
+          <td class="currency" <% if (total_material_budget-total_budget).abs > 0.005 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_material_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_spent_material_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency" <% if (total_material_budget - total_spent_material_budget)!=0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_material_budget - total_spent_material_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency" <% if (total_planned_budget - total_spent_material_budget)<0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_planned_budget - total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_balance, unit: "", :precision => 2) %></strong></td>
+          <td class="currency" <% if (total_balance/total_budget)< 0.1 %>bgcolor="orange"<% end %>><strong><%= number_to_percentage(total_balance/total_budget*100, :precision => 2) %></strong></td>
           <td />
         <tr>
+        <tr>
+            <td></td>
+            <td>Gauto biudžeto suma</td>
+            <td class="currency"><strong><%= number_to_currency( total_budget, unit: "", :precision => 2) %></strong></td>
+        </tr>
         <% end %>
       </tbody>
     </table>
+    * Visos pateiktos sumos yra eurais
     <div class="generic-table--header-background"></div>
   </div>  
 </div>

@@ -114,9 +114,41 @@ class CostObject < ActiveRecord::Base
   def material_budget
     0.0
   end
+  
+  def spent_material_subbudget
+    0
+  end
+  
+  def spent_planned_material_subbudget
+    0
+  end
+  
+  def got_overall_material_budget
+    0.0
+  end
+  
+  def got_material_subbudget
+    0.0
+  end
+  
+  def planned_material_subbudget
+    0.0
+  end
 
   def budget
     material_budget + labor_budget
+  end
+
+  def overall_budget
+    got_overall_material_budget
+  end
+
+  def material_budget
+    got_material_subbudget
+  end
+  
+  def planned_subbudget
+    planned_material_subbudget
   end
 
   # Label of the current type for display in GUI.  Virtual accessor that is overriden by subclasses.
@@ -142,5 +174,9 @@ class CostObject < ActiveRecord::Base
 
   def to_s
     subject
+  end
+  
+  def material_budget_category
+    0.0
   end
 end

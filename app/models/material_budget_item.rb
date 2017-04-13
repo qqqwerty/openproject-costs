@@ -41,6 +41,36 @@ class MaterialBudgetItem < ActiveRecord::Base
 
     scope
   }
+  
+  scope :overall_costs, lambda { |*args|
+    scope = visible(args.first || User.current).where(category: 0)
+
+    if args[1]
+      scope = scope.where(cost_object: { projects_id: args[1].id })
+    end
+
+    scope
+  }
+  
+  scope :material_subcosts, lambda { |*args|
+    scope = visible(args.first || User.current).where(category: 1)
+
+    if args[1]
+      scope = scope.where(cost_object: { projects_id: args[1].id })
+    end
+
+    scope
+  }
+  
+  scope :planned_material_subcosts, lambda { |*args|
+    scope = visible(args.first || User.current).where(category: 2)
+
+    if args[1]
+      scope = scope.where(cost_object: { projects_id: args[1].id })
+    end
+
+    scope
+  }
 
   def costs
     budget || calculated_costs

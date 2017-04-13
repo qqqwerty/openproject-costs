@@ -75,6 +75,7 @@ class AggregatedCostsMigrations < ActiveRecord::Migration
         t.integer 'tyear',                                                              null: false
         t.integer 'tmonth',                                                             null: false
         t.integer 'tweek',                                                              null: false
+        t.integer 'category'
       end
 
       create_table 'cost_objects' do |t|

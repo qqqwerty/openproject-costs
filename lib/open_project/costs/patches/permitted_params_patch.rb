@@ -27,7 +27,8 @@ module OpenProject::Costs::Patches::PermittedParamsPatch
       params.require(:cost_entry).permit(:comments,
                                          :units,
                                          :overridden_costs,
-                                         :spent_on)
+                                         :spent_on,
+                                         :category)
     end
 
     def cost_object

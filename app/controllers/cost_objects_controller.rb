@@ -108,7 +108,7 @@ class CostObjectsController < ApplicationController
     if params[:cost_object]
       @cost_object = create_cost_object(params[:cost_object].delete(:kind))
     end
-
+    
     # FIXME: I forcibly create a VariableCostObject for now. Following Ticket #5360
     @cost_object ||= VariableCostObject.new
 
@@ -122,7 +122,7 @@ class CostObjectsController < ApplicationController
     end
 
     @cost_object.attributes = permitted_params.cost_object
-    if @cost_object.save
+    if check_material_budget && @cost_object.save
       Attachment.attach_files(@cost_object, params[:attachments])
       render_attachment_warning_if_needed(@cost_object)
 
@@ -150,9 +150,7 @@ class CostObjectsController < ApplicationController
     # TODO: use better way to prevent mass assignment errors
     params[:cost_object].delete(:kind)
     @cost_object.attributes = permitted_params.cost_object if params[:cost_object]
-    Rails.logger.warn("Saving")
-    Rails.logger.warn("#{params.inspect}")
-    if @cost_object.save
+    if check_material_budget && @cost_object.save
       Attachment.attach_files(@cost_object, params[:attachments])
       render_attachment_warning_if_needed(@cost_object)
 
@@ -244,5 +242,53 @@ class CostObjectsController < ApplicationController
     @project = Project.find(params[:project_id]) unless params[:project_id].blank?
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+  
+  def check_material_budget
+    overall_count = 0
+    got_count = 0
+    planned_count = 0
+    got_sum = 0.0
+    planned_sum = 0.0
+    if params[:cost_object][:existing_material_budget_item_attributes] != nil
+      params[:cost_object][:existing_material_budget_item_attributes].each do |key, temp_material_budget|
+        case temp_material_budget[:category].to_i
+        when 0
+          overall_count += 1
+        when 1
+          got_count += 1
+          got_sum += temp_material_budget[:units].to_f
+        when 2
+          planned_count += 1
+          planned_sum += temp_material_budget[:units].to_f
+        end
+      end
+    end
+    if params[:cost_object][:new_material_budget_item_attributes] != nil
+      params[:cost_object][:new_material_budget_item_attributes].each do |key, temp_material_budget|
+          if temp_material_budget[:units].to_f > 0
+            case temp_material_budget[:category].to_i
+            when 0
+              overall_count += 1
+            when 1
+              got_count += 1
+              got_sum += temp_material_budget[:units].to_f
+            when 2
+              planned_count += 1
+              planned_sum += temp_material_budget[:units].to_f
+            end
+          end
+      end
+    end
+    if overall_count > 0 && (got_count > 0 || planned_count > 0)
+      flash[:notice] = "Gautas bendras biudžetas negali būti kartu su gautu vienos srities ir planuojamu biudžetais"
+      return false
+    else
+      if got_sum < planned_sum
+        flash[:notice] = "Planuojamas biudžetas negali būti didesnis nei gautas"
+        return false
+      end
+    end
+    return true
   end
 end

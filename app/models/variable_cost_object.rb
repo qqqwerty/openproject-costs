@@ -54,7 +54,19 @@ class VariableCostObject < CostObject
   def material_budget
     @material_budget ||= material_budget_items.visible_costs.inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
   end
-
+  
+  def got_overall_material_budget
+    @got_overall_material_budget ||= material_budget_items.overall_costs.inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
+  end
+  
+  def got_material_subbudget
+    @got_material_subbudget ||= material_budget_items.material_subcosts.inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
+  end
+  
+  def planned_material_subbudget
+    @planned_material_subbudget ||= material_budget_items.planned_material_subcosts.inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
+  end
+  
   def labor_budget
     @labor_budget ||= labor_budget_items.visible_costs.inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
   end
@@ -62,13 +74,41 @@ class VariableCostObject < CostObject
   def spent
     spent_material + spent_labor
   end
-
+  
   def spent_material
     @spent_material ||= begin
       if cost_entries.blank?
         BigDecimal.new('0.0000')
       else
         cost_entries.visible_costs(User.current, project).sum("CASE
+          WHEN #{CostEntry.table_name}.overridden_costs IS NULL THEN
+            #{CostEntry.table_name}.costs
+          ELSE
+            #{CostEntry.table_name}.overridden_costs END").to_d
+      end
+    end
+  end
+  
+  def spent_material_subbudget
+    @spent_got_material ||= begin
+      if cost_entries.blank?
+        BigDecimal.new('0.0000')
+      else
+        cost_entries.visible_costs(User.current, project).where(category: 1).sum("CASE
+          WHEN #{CostEntry.table_name}.overridden_costs IS NULL THEN
+            #{CostEntry.table_name}.costs
+          ELSE
+            #{CostEntry.table_name}.overridden_costs END").to_d
+      end
+    end
+  end
+  
+  def spent_planned_material_subbudget
+    @spent_planned_material ||= begin
+      if cost_entries.blank?
+        BigDecimal.new('0.0000')
+      else
+        cost_entries.visible_costs(User.current, project).where(category: 2).sum("CASE
           WHEN #{CostEntry.table_name}.overridden_costs IS NULL THEN
             #{CostEntry.table_name}.costs
           ELSE
