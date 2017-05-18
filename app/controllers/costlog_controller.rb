@@ -43,7 +43,8 @@ class CostlogController < ApplicationController
                 'work_package' => 'work_package_id',
                 'cost_type' => 'cost_type_id',
                 'units' => 'units',
-                'costs' => 'costs'
+                'costs' => 'costs',
+                'category' => 'category'
 
     cond = ARCondition.new
     if @project.nil?

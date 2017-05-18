@@ -62,6 +62,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                            data: { :'request-key' => 'cost_type_id' }
                          } %>
   </td>
+  <td class="category">
+    <label class="hidden-for-sighted">Kaðtø kategorija</label>
+    <%= cost_form.select :category,
+                         [
+                            ['Gautas bendras biudþetas', 0],
+                            ['Gautas vienos srities biudþetas', 1],
+                            ['Ámonës planuojamas biudþetas', 2],
+                            ['Nevykdomi darbai', 3]
+                         ],
+                         {},
+                         {
+                           index: id_or_index,
+                           class: 'form--select budget-item-value',
+                           data: { :'request-key' => 'category' }
+                         } %>
+  </td>
   <td class="comment">
     <label class="hidden-for-sighted" for="<%= id_prefix %>_comments"><%= MaterialBudgetItem.human_attribute_name(:comments) %></label>
     <%= cost_form.text_field :comments, index: id_or_index, size: 40 %>

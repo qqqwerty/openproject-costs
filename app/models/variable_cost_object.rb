@@ -54,7 +54,18 @@ class VariableCostObject < CostObject
   def material_budget
     @material_budget ||= material_budget_items.visible_costs.inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
   end
+  
+  def got_material_budget(needed_category)
+    @got_material_budget = nil
+    Rails.logger.warn("From view I got " + needed_category.inspect)
+    if !needed_category.is_a? Integer
+      needed_category = 1
+    end
+    @got_material_budget ||= material_budget_items.visible_budget_costs(User.current, needed_category).inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
 
+    @got_material_budget
+  end
+  
   def labor_budget
     @labor_budget ||= labor_budget_items.visible_costs.inject(BigDecimal.new('0.0000')) { |sum, i| sum += i.costs }
   end
@@ -69,6 +80,24 @@ class VariableCostObject < CostObject
         BigDecimal.new('0.0000')
       else
         cost_entries.visible_costs(User.current, project).sum("CASE
+          WHEN #{CostEntry.table_name}.overridden_costs IS NULL THEN
+            #{CostEntry.table_name}.costs
+          ELSE
+            #{CostEntry.table_name}.overridden_costs END").to_d
+      end
+    end
+  end
+  
+  def spent_material_budget(needed_category)
+    @spent_material_budget = nil
+    if !needed_category.is_a? Integer
+      needed_category = 1
+    end
+    @spent_material_budget ||= begin
+      if cost_entries.blank?
+        BigDecimal.new('0.0000')
+      else
+        cost_entries.visible_costs(User.current, project).where(category: needed_category).sum("CASE
           WHEN #{CostEntry.table_name}.overridden_costs IS NULL THEN
             #{CostEntry.table_name}.costs
           ELSE

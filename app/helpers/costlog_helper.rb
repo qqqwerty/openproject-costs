@@ -44,6 +44,10 @@ module CostlogHelper
   end
 
   def extended_progress_bar(pcts, options = {})
+    pcts = pcts.to_f
+    if pcts > 100
+      pcts = 100
+    end
     return progress_bar(pcts, options) unless pcts.is_a?(Numeric) && pcts > 100
 
     width = options[:width] || '100px;'

@@ -41,7 +41,17 @@ class MaterialBudgetItem < ActiveRecord::Base
 
     scope
   }
+  
+  scope :visible_budget_costs, lambda { |*args|
+    scope = visible(args.first || User.current)
+    
+    if args[1]
+      scope = scope.where(category: args[1].to_i)
+    end
 
+    scope
+  }
+  
   def costs
     budget || calculated_costs
   end
