@@ -63,13 +63,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                          } %>
   </td>
   <td class="category">
-    <label class="hidden-for-sighted">Kaðtø kategorija</label>
+    <label class="hidden-for-sighted"><%= I18n.t(:label_costs_category) %></label>
     <%= cost_form.select :category,
                          [
-                            ['Gautas bendras biudþetas', 0],
-                            ['Gautas vienos srities biudþetas', 1],
-                            ['Ámonës planuojamas biudþetas', 2],
-                            ['Nevykdomi darbai', 3]
+                            [I18n.t(:select_got_overall_budget), 0],
+                            [I18n.t(:select_got_one_type_budget), 1],
+                            [I18n.t(:select_planned_budget), 2],
+                            [I18n.t(:select_skipped_works_budget), 3]
                          ],
                          {},
                          {

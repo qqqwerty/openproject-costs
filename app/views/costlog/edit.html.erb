@@ -79,8 +79,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <div class="form--field">
         <%= f.select :category,
                      [
-                      ['Su uþsakovu atsiskaitytas biudþetas', 1],
-                      ['Faktiðkai ávykdytas biudþetas', 2]
+                      [I18n.t(:select_reported_overall_budget), 1],
+                      [I18n.t(:select_reported_one_type_budget), 2]
                      ],
                      { prompt: true },
                      {

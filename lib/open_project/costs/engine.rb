@@ -327,7 +327,7 @@ module OpenProject::Costs
 
     assets %w(
       costs/costs.css
-      costs/costs.js
+      costs/cost_objects.js
     )
 
     initializer 'costs.register_hooks' do

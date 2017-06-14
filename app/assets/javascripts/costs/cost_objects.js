@@ -3,8 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-
 function showhide(column, elem){
     if (elem.checked)
         dp = "table-cell";
@@ -14,3 +12,4 @@ function showhide(column, elem){
     for (i=0; i<tds.length; i++)
         tds[i].childNodes[column].style.display = dp;
 }
+

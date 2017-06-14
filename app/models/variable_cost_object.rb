@@ -57,7 +57,6 @@ class VariableCostObject < CostObject
   
   def got_material_budget(needed_category)
     @got_material_budget = nil
-    Rails.logger.warn("From view I got " + needed_category.inspect)
     if !needed_category.is_a? Integer
       needed_category = 1
     end

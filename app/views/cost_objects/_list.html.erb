@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ++#%>
 
 <%= form_tag({}) do -%>
-<%= javascript_include_tag "costs/hideableColumnsOfTable.js" %>
+<%= javascript_include_tag "costs/cost_objects.js" %>
 
 <div class="generic-table--container">
   <div class="generic-table--results-container">
@@ -48,7 +48,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  Gautas
+                  <%= I18n.t(:label_got_budget) %>
                 </span>
               </div>
             </div>
@@ -57,7 +57,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  Atsiskaitytas
+                  <%= I18n.t(:label_reported_budget) %>
                 </span>
               </div>
             </div>
@@ -66,7 +66,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  Neatsiskaitytas
+                  <%= I18n.t(:label_not_reported_budget) %>
                 </span>
               </div>
             </div>
@@ -75,7 +75,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  Nevykdomi darbai
+                  <%= I18n.t(:label_skipped_works_ammount) %>
                 </span>
               </div>
             </div>
@@ -93,7 +93,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                    Ásisavintas
+                    <%= I18n.t(:label_absorbed_budget) %>
                 </span>
               </div>
             </div>
@@ -102,7 +102,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                    Neásisavintas
+                    <%= I18n.t(:label_not_absorbed_budget) %>
                 </span>
               </div>
             </div>
@@ -111,7 +111,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  Pelningumas
+                  <%= I18n.t(:label_profit) %>
                 </span>
               </div>
             </div>
@@ -120,7 +120,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  Pelningumas procentais
+                  <%= I18n.t(:label_profit_in_percentage) %>
                 </span>
               </div>
             </div>
@@ -129,7 +129,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  Dalis nuo viso biudþeto
+                  <%= I18n.t(:label_ratio_from_overall_budget) %>
                 </span>
               </div>
             </div>
@@ -165,7 +165,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           balance = BigDecimal.new("0")
         %>
         <% cost_objects.each do |cost_object| %>
-          <% Rails.logger.warn(cost_object.inspect) %>
           <%  overall_material_budget = cost_object.got_material_budget(0)
         cost_object.got_material_budget(1)%>
           <%  if overall_material_budget > 0 %>
@@ -190,9 +189,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           </tr>
           <% end %>
         <% end %>
-          <% Rails.logger.warn("Another part") %>
         <% cost_objects.each do |cost_object| %>
-          <% Rails.logger.warn(cost_object.inspect) %>
           <% if cost_object.got_material_budget(0) <= 0 %>
             <tr id="cost_object-<%= cost_object.id %>" class="<%= cost_object.css_classes %>">
               <%
@@ -256,7 +253,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         </tr>
         <tr>
           <td> </td>
-          <td>Gauto biudþeto suma</td>
+          <td><%= I18n.t(:label_got_budget_sum) %></td>
           <td class="currency"><strong><%= number_to_currency( total_budget, unit: "", :precision => 2) %></strong></td>
           <td> </td>
           <td> </td>
@@ -272,23 +269,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <% end %>
       </tbody>
     </table>
-    * Visos pateiktos sumos yra eurais
+    <%= I18n.t(:label_all_amounts_in_euro) %>
     <div class="generic-table--header-background"></div>
   </div>  
 </div>
-Rodomi stulpeliai<br>
-<input type="checkbox" onclick="showhide(1, this);" checked="checked" /> Pavadinimas<br/>
-<input type="checkbox" onclick="showhide(3, this);" checked="checked" /> ID<br/>
-<input type="checkbox" onclick="showhide(5, this);" checked="checked" /> Gautas<br/>
-<input type="checkbox" onclick="showhide(7, this);" checked="checked" /> Atsiskaitytas<br/>
-<input type="checkbox" onclick="showhide(9, this);" checked="checked" /> Neatsiskaitytas<br/>
-<input type="checkbox" onclick="showhide(11, this);" checked="checked" /> Nevykdomi darbai<br/>
-<input type="checkbox" onclick="showhide(13, this);" checked="checked" /> Planuojamas<br/>
-<input type="checkbox" onclick="showhide(15, this);" checked="checked" /> Ásisavintas<br/>
-<input type="checkbox" onclick="showhide(17, this);" checked="checked" /> Neásisavintas<br/>
-<input type="checkbox" onclick="showhide(19, this);" checked="checked" /> Pelningumas<br/>
-<input type="checkbox" onclick="showhide(21, this);" checked="checked" /> Pelningumas procentais<br/>
-<input type="checkbox" onclick="showhide(23, this);" checked="checked" /> Dalis nuo viso biudþeto<br/>
-<input type="checkbox" onclick="showhide(25, this);" checked="checked" /> Praleista<br/>
+<%= I18n.t(:label_displayed_columns) %><br>
+<input type="checkbox" onclick="showhide(1, this);" checked="checked" /> <%= CostObject.human_attribute_name(:subject)%><br/>
+<input type="checkbox" onclick="showhide(3, this);" checked="checked" /> <%= I18n.t(:label_id) %><br/>
+<input type="checkbox" onclick="showhide(5, this);" checked="checked" /> <%= I18n.t(:label_got_budget) %><br/>
+<input type="checkbox" onclick="showhide(7, this);" checked="checked" /> <%= I18n.t(:label_reported_budget) %><br/>
+<input type="checkbox" onclick="showhide(9, this);" checked="checked" /> <%= I18n.t(:label_not_reported_budget) %><br/>
+<input type="checkbox" onclick="showhide(11, this);" checked="checked" /> <%= I18n.t(:label_skipped_works_ammount) %><br/>
+<input type="checkbox" onclick="showhide(13, this);" checked="checked" /> <%= CostObject.human_attribute_name(:budget) %><br/>
+<input type="checkbox" onclick="showhide(15, this);" checked="checked" /> <%= I18n.t(:label_absorbed_budget) %><br/>
+<input type="checkbox" onclick="showhide(17, this);" checked="checked" /> <%= I18n.t(:label_not_absorbed_budget) %><br/>
+<input type="checkbox" onclick="showhide(19, this);" checked="checked" /> <%= I18n.t(:label_profit) %><br/>
+<input type="checkbox" onclick="showhide(21, this);" checked="checked" /> <%= I18n.t(:label_profit_in_percentage) %><br/>
+<input type="checkbox" onclick="showhide(23, this);" checked="checked" /> <%= I18n.t(:label_ratio_from_overall_budget) %><br/>
+<input type="checkbox" onclick="showhide(25, this);" checked="checked" /> <%= CostObject.human_attribute_name(:budget_ratio) %><br/>
 
 <% end -%>
