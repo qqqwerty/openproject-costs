@@ -151,6 +151,13 @@ class CostObjectsController < ApplicationController
     # TODO: use better way to prevent mass assignment errors
     params[:cost_object].delete(:kind)
     @cost_object.attributes = permitted_params.cost_object if params[:cost_object]
+    if params[:cost_object][:existing_material_budget_item_attributes].nil?
+      @cost_object.existing_material_budget_item_attributes=({})
+    end
+    if params[:cost_object][:existing_labor_budget_item_attributes].nil?
+      @cost_object.existing_labor_budget_item_attributes=({})
+    end
+
 
     if @cost_object.save
       Attachment.attach_files(@cost_object, params[:attachments])
@@ -173,12 +180,18 @@ class CostObjectsController < ApplicationController
   end
 
   def update_material_budget_item
-    @element_id = params[:element_id] if params[:element_id].present?
+    @element_id = params[:element_id]
 
-    @cost_type = CostType.find(params[:cost_type_id]) if params[:cost_type_id].present?
+    cost_type = CostType.where(id: params[:cost_type_id]).first
 
-    @units = BigDecimal.new(Rate.clean_currency(params[:units]))
-    @costs = (@units * @cost_type.rate_at(params[:fixed_date]).rate rescue 0.0)
+    if cost_type && params[:units].present?
+      volume = BigDecimal.new(Rate.clean_currency(params[:units]))
+      @costs = (volume * cost_type.rate_at(params[:fixed_date]).rate rescue 0.0)
+      @unit = volume == 1.0 ? cost_type.unit : cost_type.unit_plural
+    else
+      @costs = 0.0
+      @unit = ''
+    end
 
     respond_to do |format|
       format.js { render :update_material_budget_item }
@@ -186,11 +199,15 @@ class CostObjectsController < ApplicationController
   end
 
   def update_labor_budget_item
-    @element_id = params[:element_id] if params[:element_id].present?
-    @user = User.find(params[:user_id]) if params[:user_id].present?
+    @element_id = params[:element_id]
+    user = User.where(id: params[:user_id]).first
 
-    @hours = params[:hours].to_hours
-    @costs = @hours * @user.rate_at(params[:fixed_date], @project).rate rescue 0.0
+    if user && params[:hours]
+      hours = params[:hours].to_s.to_hours
+      @costs = hours * user.rate_at(params[:fixed_date], @project).rate rescue 0.0
+    else
+      @costs = 0.0
+    end
 
     respond_to do |format|
       format.js { render :update_labor_budget_item }
