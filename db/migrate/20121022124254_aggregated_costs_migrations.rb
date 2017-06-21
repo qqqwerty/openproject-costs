@@ -75,6 +75,7 @@ class AggregatedCostsMigrations < ActiveRecord::Migration
         t.integer 'tyear',                                                              null: false
         t.integer 'tmonth',                                                             null: false
         t.integer 'tweek',                                                              null: false
+        t.integer 'category'
       end
 
       create_table 'cost_objects' do |t|
@@ -112,6 +113,7 @@ class AggregatedCostsMigrations < ActiveRecord::Migration
         t.integer 'cost_type_id'
         t.string 'comments',                                      default: '', null: false
         t.decimal 'budget',         precision: 15, scale: 4
+        t.integer 'category'
       end
 
       create_table 'rates' do |t|
