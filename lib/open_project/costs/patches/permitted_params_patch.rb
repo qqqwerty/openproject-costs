@@ -27,17 +27,18 @@ module OpenProject::Costs::Patches::PermittedParamsPatch
       params.require(:cost_entry).permit(:comments,
                                          :units,
                                          :overridden_costs,
-                                         :spent_on)
+                                         :spent_on,
+                                         :category)
     end
 
     def cost_object
       params.require(:cost_object).permit(:subject,
                                           :description,
                                           :fixed_date,
-                                          { new_material_budget_item_attributes: [:units, :cost_type_id, :comments, :budget] },
-                                          { new_labor_budget_item_attributes: [:hours, :user_id, :comments, :budget] },
-                                          { existing_material_budget_item_attributes: [:units, :cost_type_id, :comments, :budget] },
-                                          existing_labor_budget_item_attributes: [:hours, :user_id, :comments, :budget])
+                                          { new_material_budget_item_attributes: [:units, :cost_type_id, :comments, :budget, :category] },
+                                          { new_labor_budget_item_attributes: [:hours, :user_id, :comments, :budget, :category] },
+                                          { existing_material_budget_item_attributes: [:units, :cost_type_id, :comments, :budget, :category] },
+                                          existing_labor_budget_item_attributes: [:hours, :user_id, :comments, :budget, :category])
     end
 
     def cost_type

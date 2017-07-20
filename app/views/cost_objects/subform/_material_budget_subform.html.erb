@@ -22,18 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
   <%# Build a template object for the frontend to add new rows %>
   <% template_object = @cost_object.material_budget_items.build(cost_type: CostType.default) %>
 
-  <costs-budget-subform item-count="<%= @cost_object.material_budget_items.length %>"
-                        update-url="<%= url_for(action: :update_material_budget_item, project_id: @project.id) %>">
-    <fieldset id="material_budget_items_fieldset" class="form--fieldset -collapsible">
-      <legend class="form--fieldset-legend" onclick="toggleFieldset(this);"><%= VariableCostObject.human_attribute_name(:material_budget) %></legend>
-        <div class="generic-table--container">
-          <div class="generic-table--results-container">
-            <table class="generic-table" id="material_budget_items">
-              <colgroup>
-                <col highlight-col>
-                <col highlight-col>
-                <col highlight-col>
-                <% if User.current.allowed_to?(:view_cost_rates, @project)%>
+<costs-budget-subform item-count="<%= @cost_object.material_budget_items.length %>"
+                      update-url="<%= url_for(action: :update_material_budget_item, project_id: @project.id) %>">
+  <fieldset id="material_budget_items_fieldset" class="form--fieldset -collapsible">
+    <legend class="form--fieldset-legend" onclick="toggleFieldset(this);"><%= VariableCostObject.human_attribute_name(:material_budget) %></legend>
+      <div class="generic-table--container">
+        <div class="generic-table--results-container">
+          <table interactive-table class="generic-table" id="material_budget_items">
+            <colgroup>
+              <col highlight-col>
+              <col highlight-col>
+              <col highlight-col>
+              <col highlight-col>
+              <% if User.current.allowed_to?(:view_cost_rates, @project)%>
                   <col highlight-col>
                 <%end%>
                 <col>
@@ -57,14 +58,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                       </span>
                     </div>
                   </div>
-                </th>
-                <th>
-                  <div class="generic-table--sort-header-outer">
-                    <div class="generic-table--sort-header">
-                      <span>
-                        <%= MaterialBudgetItem.human_attribute_name(:cost_type) %>
-                      </span>
-                    </div>
+                </div>
+              </th>
+              <th>
+                <div class="generic-table--sort-header-outer">
+                  <div class="generic-table--sort-header">
+                    <span>
+                      <%= I18n.t(:label_costs_category) %>
+                    </span>
+                  </div>
+                </div>
+              </th>
+              <th>
+                <div class="generic-table--sort-header-outer">
+                  <div class="generic-table--sort-header">
+                    <span>
+                      <%= MaterialBudgetItem.human_attribute_name(:comment) %>
+                    </span>
                   </div>
                 </th>
                 <th>

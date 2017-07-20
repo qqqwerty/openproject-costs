@@ -114,6 +114,14 @@ class CostObject < ActiveRecord::Base
   def material_budget
     0.0
   end
+  
+  def spent_material_budget(category)
+    0.0
+  end
+  
+  def got_material_budget(category)
+    0.0
+  end
 
   def budget
     material_budget + labor_budget

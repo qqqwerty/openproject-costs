@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ++#%>
 
 <%= form_tag({}) do -%>
+<%= javascript_include_tag "costs/cost_objects.js" %>
 
 <div class="generic-table--container">
   <div class="generic-table--results-container">
@@ -30,12 +31,56 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         <col highlight-col>
         <col highlight-col>
         <col highlight-col>
+        <col highlight-col>
+        <col highlight-col>
+        <col highlight-col>
+        <col highlight-col>
+        <col highlight-col>
+        <col highlight-col>
+        <col highlight-col>
+        <col highlight-col>
       </colgroup>
       <thead>
         <tr>
-          <%= sort_header_tag("id", :caption => '#', :default_order => 'desc') %>
           <%= sort_header_tag("subject", :caption => CostObject.human_attribute_name(:subject)) %>
-          <th class="currency">
+          <%= sort_header_tag("id", :caption => '#', :default_order => 'desc') %>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= I18n.t(:label_got_budget) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= I18n.t(:label_reported_budget) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= I18n.t(:label_not_reported_budget) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= I18n.t(:label_skipped_works_ammount) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -44,20 +89,47 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th class="currency">
+          <th>
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  <%= CostObject.human_attribute_name(:spent) %>
+                    <%= I18n.t(:label_absorbed_budget) %>
                 </span>
               </div>
             </div>
           </th>
-          <th class="currency">
+          <th>
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
-                  <%= CostObject.human_attribute_name(:available) %>
+                    <%= I18n.t(:label_not_absorbed_budget) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= I18n.t(:label_profit) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= I18n.t(:label_profit_in_percentage) %>
+                </span>
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="generic-table--sort-header-outer">
+              <div class="generic-table--sort-header">
+                <span>
+                  <%= I18n.t(:label_ratio_from_overall_budget) %>
                 </span>
               </div>
             </div>
@@ -74,37 +146,146 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         </tr>
       </thead>
       <tbody>
-        <% total_budget = BigDecimal.new("0"); labor_budget = BigDecimal.new("0"); material_budget = BigDecimal.new("0"); spent = BigDecimal.new("0") %>
+        <%
+          total_budget = BigDecimal.new("0")
+          total_material_budget = BigDecimal.new("0")
+          total_spent_material_budget = BigDecimal.new("0")
+          total_not_spent = BigDecimal.new("0")
+          total_planned_budget = BigDecimal.new("0")
+          total_spent_planned_budget = BigDecimal.new("0")
+          total_balance = BigDecimal.new("0")
+          overall_material_budget = BigDecimal.new("0")
+          material_budget = BigDecimal.new("0")
+          spent_material_budget = BigDecimal.new("0")
+          material_budget_balance = BigDecimal.new("0")
+          not_spent_budget = BigDecimal.new("0")
+          planned_budget = BigDecimal.new("0")
+          spent_planned_budget = BigDecimal.new("0")
+          plannet_budget_balance = BigDecimal.new("0")
+          balance = BigDecimal.new("0")
+        %>
         <% cost_objects.each do |cost_object| %>
-        <tr id="cost_object-<%= cost_object.id %>" class="<%= cost_object.css_classes %>">
-          <td><%= link_to cost_object.id, cost_object_path(cost_object.id) %></td>
-          <%= content_tag(:td, link_to(h(cost_object.subject), cost_object_path(cost_object.id)), :class => 'subject') %>
-          <%= content_tag(:td, number_to_currency(cost_object.budget, :precision => 0), :class => 'currency') %>
-          <%= content_tag(:td, number_to_currency(cost_object.spent, :precision => 0), :class => 'currency') %>
-          <%= content_tag(:td, number_to_currency(cost_object.budget - cost_object.spent, :precision => 0), :class => 'currency') %>
-          <%= content_tag(:td, extended_progress_bar(cost_object.budget_ratio, :legend => "#{cost_object.budget_ratio}")) %>
-          <%-
-            total_budget += cost_object.budget
-            labor_budget += cost_object.labor_budget
-            material_budget += cost_object.material_budget
-            spent += cost_object.spent
-          -%>
-        </tr>
+          <%  overall_material_budget = cost_object.got_material_budget(0)
+        cost_object.got_material_budget(1)%>
+          <%  if overall_material_budget > 0 %>
+            <tr id="cost_object-<%= cost_object.id %>" class="<%= cost_object.css_classes %>">
+            <%
+                total_budget += overall_material_budget
+            %>
+            <%= content_tag(:td, link_to(h(cost_object.subject), cost_object_path(cost_object.id)), :class => 'subject') %>
+            <td><%= link_to cost_object.id, cost_object_path(cost_object.id) %></td>
+            
+            <%= content_tag(:td, number_to_currency(overall_material_budget, unit: "", :precision => 2), :class => 'currency') %>
+            <td>-</td> 
+            <td>-</td> 
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+          <% end %>
+        <% end %>
+        <% cost_objects.each do |cost_object| %>
+          <% if cost_object.got_material_budget(0) <= 0 %>
+            <tr id="cost_object-<%= cost_object.id %>" class="<%= cost_object.css_classes %>">
+              <%
+                material_budget = cost_object.got_material_budget(1)
+                spent_material_budget = cost_object.spent_material_budget(1)
+                material_budget_balance = material_budget - spent_material_budget
+                not_spent_budget = cost_object.got_material_budget(3)
+                planned_budget = cost_object.got_material_budget(2)
+                spent_planned_budget = cost_object.spent_material_budget(2)
+                plannet_budget_balance = planned_budget - spent_planned_budget
+                balance = material_budget - spent_planned_budget
+
+                total_material_budget += material_budget
+                total_spent_material_budget += spent_material_budget
+                total_not_spent += not_spent_budget
+                total_planned_budget += planned_budget
+                total_spent_planned_budget += spent_planned_budget
+                total_balance += balance
+              %>
+              <%= content_tag(:td, link_to(h(cost_object.subject), cost_object_path(cost_object.id)), :class => 'subject') %>
+              <td><%= link_to cost_object.id, cost_object_path(cost_object.id) %></td>
+              <%= content_tag(:td, number_to_currency(material_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(spent_material_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(material_budget_balance, unit: "", :precision => 2), bgcolor: (material_budget-spent_material_budget)!=0 ? "orange" : nil) %>
+              <%= content_tag(:td, number_to_currency(not_spent_budget, unit: "", :precision => 2), bgcolor: not_spent_budget > 0 ? "orange" : nil) %>
+              <%= content_tag(:td, number_to_currency(planned_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(spent_planned_budget, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(plannet_budget_balance, unit: "", :precision => 2), bgcolor: (material_budget-spent_material_budget)<0 ? "orange" : nil) %>
+              <%= content_tag(:td, number_to_currency(balance, unit: "", :precision => 2)) %>
+              <% if material_budget > 0 %>
+                <%= content_tag(:td, number_with_precision(balance/material_budget * 100, :precision => 2) + '%', bgcolor: balance/material_budget < 0.1 ? "orange" : nil) %>
+                <%= content_tag(:td, number_with_precision(material_budget/total_budget * 100, :precision => 2) + '%') %>      
+                <%= content_tag(:td, extended_progress_bar(spent_material_budget/material_budget*100, :legend => "#{number_with_precision(spent_material_budget/material_budget*100, :precision => 2)}")) %>
+              <% else %>   
+                <td> </td>
+                <td> </td>  
+                <td> </td>
+              <% end %>
+            </tr>
+          <% end %>
         <% end %>
         <% if cost_objects.length > 0 %>
         <tr>
-          <td />
-          <td />
-          <td class="currency"><strong><%= number_to_currency( total_budget, :precision => 0) %></strong></td>
-          <td class="currency"><strong><%= number_to_currency( spent, :precision => 0) %></strong></td>
-          <td class="currency"><strong><%= number_to_currency( total_budget - spent, :precision => 0) %></strong></td>
-          <td />
+          <td> </td>
+          <td> Suma </td>
+          <td class="currency" <% if (total_material_budget-total_budget).abs > 0.005 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_material_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_spent_material_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency" <% if (total_material_budget - total_spent_material_budget)!=0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_material_budget - total_spent_material_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency" <% if total_not_spent>0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_not_spent, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency" <% if (total_planned_budget - total_spent_material_budget)<0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_planned_budget - total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td class="currency"><strong><%= number_to_currency( total_balance, unit: "", :precision => 2) %></strong></td>
+          <% if total_budget > 0 %>
+            <td class="currency" <% if (total_balance/total_budget)< 0.1 %>bgcolor="orange"<% end %>><strong><%= number_to_percentage(total_balance/total_budget*100, :precision => 2) %></strong></td>
+          <% else %>
+            <td> </td>
+          <% end %>
+          <td> </td>
+          <td> </td>
+        </tr>
         <tr>
+          <td> </td>
+          <td><%= I18n.t(:label_got_budget_sum) %></td>
+          <td class="currency"><strong><%= number_to_currency( total_budget, unit: "", :precision => 2) %></strong></td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+          <td> </td>
+        </tr>
         <% end %>
       </tbody>
     </table>
-
-  </div>
+    <%= I18n.t(:label_all_amounts_in_euro) %>
+    <div class="generic-table--header-background"></div>
+  </div>  
 </div>
+<%= I18n.t(:label_displayed_columns) %><br>
+<input type="checkbox" onclick="showhide(1, this);" checked="checked" /> <%= CostObject.human_attribute_name(:subject)%><br/>
+<input type="checkbox" onclick="showhide(3, this);" checked="checked" /> <%= I18n.t(:label_id) %><br/>
+<input type="checkbox" onclick="showhide(5, this);" checked="checked" /> <%= I18n.t(:label_got_budget) %><br/>
+<input type="checkbox" onclick="showhide(7, this);" checked="checked" /> <%= I18n.t(:label_reported_budget) %><br/>
+<input type="checkbox" onclick="showhide(9, this);" checked="checked" /> <%= I18n.t(:label_not_reported_budget) %><br/>
+<input type="checkbox" onclick="showhide(11, this);" /> <%= I18n.t(:label_skipped_works_ammount) %><br/>
+<input type="checkbox" onclick="showhide(13, this);" /> <%= CostObject.human_attribute_name(:budget) %><br/>
+<input type="checkbox" onclick="showhide(15, this);" /> <%= I18n.t(:label_absorbed_budget) %><br/>
+<input type="checkbox" onclick="showhide(17, this);" /> <%= I18n.t(:label_not_absorbed_budget) %><br/>
+<input type="checkbox" onclick="showhide(19, this);" checked="checked" /> <%= I18n.t(:label_profit) %><br/>
+<input type="checkbox" onclick="showhide(21, this);" checked="checked" /> <%= I18n.t(:label_profit_in_percentage) %><br/>
+<input type="checkbox" onclick="showhide(23, this);" checked="checked" /> <%= I18n.t(:label_ratio_from_overall_budget) %><br/>
+<input type="checkbox" onclick="showhide(25, this);" checked="checked" /> <%= CostObject.human_attribute_name(:budget_ratio) %><br/>
 
 <% end -%>
