@@ -26,11 +26,9 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-import {DisplayField} from 'app/components/wp-display/wp-display-field/wp-display-field.module';
+import {DisplayField} from 'core-components/wp-display/wp-display-field/wp-display-field.module';
 
 export class CurrencyDisplayField extends DisplayField {
-
-  isManualRenderer = true;
 
   public isEmpty(): boolean {
     return !this.value ||

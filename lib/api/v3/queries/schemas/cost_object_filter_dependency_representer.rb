@@ -17,8 +17,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #++
 
-module OpenProject
-  module Costs
-    VERSION = "7.1.0"
+module API
+  module V3
+    module Queries
+      module Schemas
+        class CostObjectFilterDependencyRepresenter <
+          FilterDependencyRepresenter
+
+          def href_callback
+            api_v3_paths.budgets_by_project filter.project.id
+          end
+
+          def type
+            "[]Budget"
+          end
+        end
+      end
+    end
   end
 end

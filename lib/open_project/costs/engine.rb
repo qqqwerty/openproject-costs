@@ -72,7 +72,7 @@ module OpenProject::Costs
       menu :admin_menu,
            :cost_types,
            { controller: '/cost_types', action: 'index' },
-           html: { class: 'icon2 icon-cost-types' },
+           icon: 'icon2 icon-cost-types',
            caption: :label_cost_type_plural
 
       menu :project_menu,
@@ -81,7 +81,7 @@ module OpenProject::Costs
            param: :project_id,
            before: :settings,
            caption: :cost_objects_title,
-           html: { class: 'icon2 icon-budget' }
+           icon: 'icon2 icon-budget'
 
       Redmine::Activity.map do |activity|
         activity.register :cost_objects, class_name: 'Activity::CostObjectActivityProvider', default: false
@@ -113,6 +113,10 @@ module OpenProject::Costs
     end
 
     add_api_path :budget do |id|
+      "#{root}/budgets/#{id}"
+    end
+
+    add_api_path :variable_cost_object do |id|
       "#{root}/budgets/#{id}"
     end
 
@@ -349,37 +353,40 @@ module OpenProject::Costs
                                                attribute: :updated_on
     end
 
-    initializer 'costs.register_query_filter' do
-      Queries::Register.filter Query, OpenProject::Costs::WorkPackageFilter
-    end
-
     module EagerLoadedCosts
       def add_eager_loading(*args)
         EagerLoadedCosts.join_costs(super)
       end
 
       def self.join_costs(scope)
-        material = WorkPackage::MaterialCosts.new
-        labor = WorkPackage::LaborCosts.new
-
         # The core adds a "LEFT OUTER JOIN time_entries" where the on clause
         # allows all time entries to be joined if he has the :view_time_entries.
-        # Because the cost scopes add another "LEFT OUTER JOIN time_entries"
-        # where the on clause allows all time entries to be joined if he has
+        # Costs will add another "LEFT OUTER JOIN time_entries". The two joins
+        # may or may not include each other's rows depending on the user's and the project's permissions.
+        # This is caused by entries being joined if he has
         # the :view_time_entries permission and additionally those which are
         # his and for which he has the :view_own_time_entries permission.
-        # Because costs join includes the values of the core, entries are joined twice.
-        # We therefore have to remove core's join.
+        # Because of that, entries may be joined twice.
+        # We therefore modify the core's join by placing it in a subquery similar to those of costs.
         #
         # This is very hacky.
         #
         # We also have to remove the sum calcualtion for time_entries.hours as
         # the calculation is later on performed within the subquery added by
         # LaborCosts. With it, we can use the value as it is calculated by the subquery.
+        material = WorkPackage::MaterialCosts.new
+        labor = WorkPackage::LaborCosts.new
+        time = scope.dup
+
+        wp_table = WorkPackage.arel_table
+        time_join = wp_table
+                    .outer_join(time.arel.as('spent_time_hours'))
+                    .on(wp_table[:id].eq(time.arel_table.alias('spent_time_hours')[:id]))
+
         scope.joins_values.reject! do |join|
           join.is_a?(Arel::Nodes::OuterJoin) &&
-               join.left.is_a?(Arel::Table) &&
-               join.left.name == 'time_entries'
+            join.left.is_a?(Arel::Table) &&
+            join.left.name == 'time_entries'
         end
         scope.select_values.reject! do |select|
           select == "SUM(time_entries.hours) AS hours"
@@ -388,16 +395,18 @@ module OpenProject::Costs
         material_scope = material.add_to_work_package_collection(scope.dup)
         labor_scope = labor.add_to_work_package_collection(scope.dup)
 
-        target_scope = scope.joins(material_scope.join_sources)
+        target_scope = scope
+                       .joins(material_scope.join_sources)
                        .joins(labor_scope.join_sources)
+                       .joins(time_join.join_sources)
                        .select(material_scope.select_values)
                        .select(labor_scope.select_values)
-                       .select('time_entries.hours')
+                       .select('spent_time_hours.hours')
 
         target_scope.joins_values.reject! do |join|
           join.is_a?(Arel::Nodes::OuterJoin) &&
-               join.left.is_a?(Arel::Nodes::TableAlias) &&
-               join.left.right == 'descendants'
+            join.left.is_a?(Arel::Nodes::TableAlias) &&
+            join.left.right == 'descendants'
         end
 
         target_scope.group_values.reject! do |group|
@@ -427,6 +436,22 @@ module OpenProject::Costs
       API::V3::WorkPackages::WorkPackageRepresenter.to_eager_load += [:cost_object]
 
       API::V3::WorkPackages::WorkPackageCollectionRepresenter.prepend EagerLoadedCosts
+
+      ##
+      # Add a new group
+      cost_attributes = %i(cost_object costs_by_type labor_costs material_costs overall_costs)
+      ::Type.add_default_group(:costs, :label_cost_plural)
+      ::Type.add_default_mapping(:costs, *cost_attributes)
+
+      constraint = ->(_type, project: nil) {
+        project.nil? || project.costs_enabled?
+      }
+
+      cost_attributes.each do |attribute|
+        ::Type.add_constraint attribute, constraint
+      end
+
+      Queries::Register.filter Query, OpenProject::Costs::WorkPackageFilter
     end
   end
 end

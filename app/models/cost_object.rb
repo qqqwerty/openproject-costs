@@ -151,4 +151,8 @@ class CostObject < ActiveRecord::Base
   def to_s
     subject
   end
+
+  def name
+    subject
+  end
 end

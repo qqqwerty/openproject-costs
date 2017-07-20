@@ -18,15 +18,9 @@
 #++
 
 module OpenProject::Costs
-  class WorkPackageFilter < ::Queries::BaseFilter
-
-    alias :project :context
-    alias :project= :context=
-
+  class WorkPackageFilter < ::Queries::WorkPackages::Filter::WorkPackageFilter
     def allowed_values
-      CostObject
-        .where(project_id: project)
-        .order('subject ASC')
+      cost_objects
         .pluck(:subject, :id)
     end
 
@@ -47,9 +41,28 @@ module OpenProject::Costs
       :list_optional
     end
 
+    def dependency_class
+      '::API::V3::Queries::Schemas::CostObjectFilterDependencyRepresenter'
+    end
+
+    def ar_object_filter?
+      true
+    end
+
+    def value_objects
+      cost_objects.where(id: values)
+    end
+
     def human_name
       WorkPackage.human_attribute_name(:cost_object)
     end
+
+    private
+
+    def cost_objects
+      CostObject
+        .where(project_id: project)
+        .order('subject ASC')
+    end
   end
 end
-

@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 <div class="generic-table--container">
   <div class="generic-table--results-container">
-    <table interactive-table class="generic-table" id="material_budget_items">
+    <table class="generic-table" id="material_budget_items">
       <colgroup>
         <col highlight-col>
         <col highlight-col>
@@ -279,10 +279,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 <input type="checkbox" onclick="showhide(5, this);" checked="checked" /> <%= I18n.t(:label_got_budget) %><br/>
 <input type="checkbox" onclick="showhide(7, this);" checked="checked" /> <%= I18n.t(:label_reported_budget) %><br/>
 <input type="checkbox" onclick="showhide(9, this);" checked="checked" /> <%= I18n.t(:label_not_reported_budget) %><br/>
-<input type="checkbox" onclick="showhide(11, this);" checked="checked" /> <%= I18n.t(:label_skipped_works_ammount) %><br/>
-<input type="checkbox" onclick="showhide(13, this);" checked="checked" /> <%= CostObject.human_attribute_name(:budget) %><br/>
-<input type="checkbox" onclick="showhide(15, this);" checked="checked" /> <%= I18n.t(:label_absorbed_budget) %><br/>
-<input type="checkbox" onclick="showhide(17, this);" checked="checked" /> <%= I18n.t(:label_not_absorbed_budget) %><br/>
+<input type="checkbox" onclick="showhide(11, this);" /> <%= I18n.t(:label_skipped_works_ammount) %><br/>
+<input type="checkbox" onclick="showhide(13, this);" /> <%= CostObject.human_attribute_name(:budget) %><br/>
+<input type="checkbox" onclick="showhide(15, this);" /> <%= I18n.t(:label_absorbed_budget) %><br/>
+<input type="checkbox" onclick="showhide(17, this);" /> <%= I18n.t(:label_not_absorbed_budget) %><br/>
 <input type="checkbox" onclick="showhide(19, this);" checked="checked" /> <%= I18n.t(:label_profit) %><br/>
 <input type="checkbox" onclick="showhide(21, this);" checked="checked" /> <%= I18n.t(:label_profit_in_percentage) %><br/>
 <input type="checkbox" onclick="showhide(23, this);" checked="checked" /> <%= I18n.t(:label_ratio_from_overall_budget) %><br/>

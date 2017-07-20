@@ -26,8 +26,11 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-import {DisplayField} from 'app/components/wp-display/wp-display-field/wp-display-field.module';
-import {WorkPackageCacheService} from 'app/components/work-packages/work-package-cache.service';
+import {DisplayField} from 'core-components/wp-display/wp-display-field/wp-display-field.module';
+import {WorkPackageCacheService} from 'core-components/work-packages/work-package-cache.service';
+import {HalResource} from 'core-components/api/api-v3/hal-resources/hal-resource.service';
+import {WorkPackageResource} from 'core-components/api/api-v3/hal-resources/work-package-resource.service';
+
 
 interface ICostsByType {
   $source: {
@@ -42,16 +45,15 @@ interface ICostsByType {
 
 export class CostsByTypeDisplayField extends DisplayField {
 
-  isManualRenderer = true;
-
-  private wpCacheService:WorkPackageCacheService;
+  public wpCacheService:WorkPackageCacheService;
 
   constructor(public resource:HalResource,
               public name:string,
-              public schema) {
+              public schema:op.FieldSchema) {
     super(resource, name, schema);
 
-    this.wpCacheService = <WorkPackageCacheService> this.$injector.get('wpCacheService');
+    this.wpCacheService = <WorkPackageCacheService>this.$injector.get('wpCacheService');
+
     this.loadIfNecessary();
   }
 
@@ -59,8 +61,8 @@ export class CostsByTypeDisplayField extends DisplayField {
     if (this.value && this.value.$loaded === false) {
       this.value.$load().then(() => {
 
-        if (this.resource._type === 'WorkPackage') {
-          this.wpCacheService.updateWorkPackage(this.resource);
+        if (this.resource.$source._type === 'WorkPackage') {
+          this.wpCacheService.updateWorkPackage(<WorkPackageResource> this.resource);
         }
       });
     }
