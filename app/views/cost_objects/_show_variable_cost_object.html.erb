@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
   <legend class="form--fieldset-legend">
     <a href="javascript:"><%= t(:caption_materials) %></a>
   </legend>
-  <div class="row" style="display:none">
+  <div class="row">
     <div class="grid-content small-12 medium-12 large-12">
       <h4><%= VariableCostObject.human_attribute_name(:material_budget) %></h4>
       <div>
@@ -109,7 +109,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               <% if User.current.allowed_to?(:view_cost_rates, @project) %>
               <tfoot>
                 <tr>
-                  <td colspan="3"></td>
+                  <td colspan="4"></td>
                   <td class="currency">
                     <div class="generic-table--footer-outer">
                       <strong><%= number_to_currency(@cost_object.material_budget) %></strong>

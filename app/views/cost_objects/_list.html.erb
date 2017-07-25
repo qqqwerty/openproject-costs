@@ -71,7 +71,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th>
+          <th style="display: none;">
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -80,7 +80,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th>
+          <th style="display: none;">
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -89,7 +89,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th>
+          <th style="display: none;">
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -98,7 +98,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th>
+          <th style="display: none;">
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -107,7 +107,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th>
+          <th style="display: none;"
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -125,7 +125,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               </div>
             </div>
           </th>
-          <th>
+          <th style="display: none;">
             <div class="generic-table--sort-header-outer">
               <div class="generic-table--sort-header">
                 <span>
@@ -178,13 +178,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             <%= content_tag(:td, number_to_currency(overall_material_budget, unit: "", :precision => 2), :class => 'currency') %>
             <td>-</td> 
             <td>-</td> 
+            <td style="display: none;">-</td>
+            <td style="display: none;">-</td>
+            <td style="display: none;">-</td>
+            <td style="display: none;">-</td>
+            <td style="display: none;">-</td>
             <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
+            <td style="display: none;">-</td>
             <td>-</td>
           </tr>
           <% end %>
@@ -214,18 +214,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
               <%= content_tag(:td, number_to_currency(material_budget, unit: "", :precision => 2)) %>
               <%= content_tag(:td, number_to_currency(spent_material_budget, unit: "", :precision => 2)) %>
               <%= content_tag(:td, number_to_currency(material_budget_balance, unit: "", :precision => 2), bgcolor: (material_budget-spent_material_budget)!=0 ? "orange" : nil) %>
-              <%= content_tag(:td, number_to_currency(not_spent_budget, unit: "", :precision => 2), bgcolor: not_spent_budget > 0 ? "orange" : nil) %>
-              <%= content_tag(:td, number_to_currency(planned_budget, unit: "", :precision => 2)) %>
-              <%= content_tag(:td, number_to_currency(spent_planned_budget, unit: "", :precision => 2)) %>
-              <%= content_tag(:td, number_to_currency(plannet_budget_balance, unit: "", :precision => 2), bgcolor: (material_budget-spent_material_budget)<0 ? "orange" : nil) %>
-              <%= content_tag(:td, number_to_currency(balance, unit: "", :precision => 2)) %>
+              <%= content_tag(:td, number_to_currency(not_spent_budget, unit: "", :precision => 2), bgcolor: not_spent_budget > 0 ? "orange" : nil, style: "display: none") %>
+              <%= content_tag(:td, number_to_currency(planned_budget, unit: "", :precision => 2), style: "display: none") %>
+              <%= content_tag(:td, number_to_currency(spent_planned_budget, unit: "", :precision => 2), style: "display: none") %>
+              <%= content_tag(:td, number_to_currency(plannet_budget_balance, unit: "", :precision => 2), bgcolor: (material_budget-spent_material_budget)<0 ? "orange" : nil, style: "display: none") %>
+              <%= content_tag(:td, number_to_currency(balance, unit: "", :precision => 2), style: "display: none") %>
               <% if material_budget > 0 %>
                 <%= content_tag(:td, number_with_precision(balance/material_budget * 100, :precision => 2) + '%', bgcolor: balance/material_budget < 0.1 ? "orange" : nil) %>
-                <%= content_tag(:td, number_with_precision(material_budget/total_budget * 100, :precision => 2) + '%') %>      
+                <%= content_tag(:td, number_with_precision(material_budget/total_budget * 100, :precision => 2) + '%', style: "display: none") %>      
                 <%= content_tag(:td, extended_progress_bar(spent_material_budget/material_budget*100, :legend => "#{number_with_precision(spent_material_budget/material_budget*100, :precision => 2)}")) %>
               <% else %>   
                 <td> </td>
-                <td> </td>  
+                <td style="display: none;"> </td>  
                 <td> </td>
               <% end %>
             </tr>
@@ -238,17 +238,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           <td class="currency" <% if (total_material_budget-total_budget).abs > 0.005 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_material_budget, unit: "", :precision => 2) %></strong></td>
           <td class="currency"><strong><%= number_to_currency( total_spent_material_budget, unit: "", :precision => 2) %></strong></td>
           <td class="currency" <% if (total_material_budget - total_spent_material_budget)!=0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_material_budget - total_spent_material_budget, unit: "", :precision => 2) %></strong></td>
-          <td class="currency" <% if total_not_spent>0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_not_spent, unit: "", :precision => 2) %></strong></td>
-          <td class="currency"><strong><%= number_to_currency( total_planned_budget, unit: "", :precision => 2) %></strong></td>
-          <td class="currency"><strong><%= number_to_currency( total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
-          <td class="currency" <% if (total_planned_budget - total_spent_material_budget)<0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_planned_budget - total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
-          <td class="currency"><strong><%= number_to_currency( total_balance, unit: "", :precision => 2) %></strong></td>
+          <td style="display: none;" class="currency" <% if total_not_spent>0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_not_spent, unit: "", :precision => 2) %></strong></td>
+          <td style="display: none;" class="currency"><strong><%= number_to_currency( total_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td style="display: none;" class="currency"><strong><%= number_to_currency( total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td style="display: none;" class="currency" <% if (total_planned_budget - total_spent_material_budget)<0 %>bgcolor="orange"<% end %>><strong><%= number_to_currency( total_planned_budget - total_spent_planned_budget, unit: "", :precision => 2) %></strong></td>
+          <td style="display: none;" class="currency"><strong><%= number_to_currency( total_balance, unit: "", :precision => 2) %></strong></td>
           <% if total_budget > 0 %>
             <td class="currency" <% if (total_balance/total_budget)< 0.1 %>bgcolor="orange"<% end %>><strong><%= number_to_percentage(total_balance/total_budget*100, :precision => 2) %></strong></td>
           <% else %>
             <td> </td>
           <% end %>
-          <td> </td>
+          <td style="display: none;"> </td>
           <td> </td>
         </tr>
         <tr>
@@ -257,13 +257,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
           <td class="currency"><strong><%= number_to_currency( total_budget, unit: "", :precision => 2) %></strong></td>
           <td> </td>
           <td> </td>
+          <td style="display: none;"> </td>
+          <td style="display: none;"> </td>
+          <td style="display: none;"> </td>
+          <td style="display: none;"> </td>
+          <td style="display: none;"> </td>
           <td> </td>
-          <td> </td>
-          <td> </td>
-          <td> </td>
-          <td> </td>
-          <td> </td>
-          <td> </td>
+          <td style="display: none;"> </td>
           <td> </td>
         </tr>
         <% end %>
@@ -283,9 +283,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 <input type="checkbox" onclick="showhide(13, this);" /> <%= CostObject.human_attribute_name(:budget) %><br/>
 <input type="checkbox" onclick="showhide(15, this);" /> <%= I18n.t(:label_absorbed_budget) %><br/>
 <input type="checkbox" onclick="showhide(17, this);" /> <%= I18n.t(:label_not_absorbed_budget) %><br/>
-<input type="checkbox" onclick="showhide(19, this);" checked="checked" /> <%= I18n.t(:label_profit) %><br/>
+<input type="checkbox" onclick="showhide(19, this);" /> <%= I18n.t(:label_profit) %><br/>
 <input type="checkbox" onclick="showhide(21, this);" checked="checked" /> <%= I18n.t(:label_profit_in_percentage) %><br/>
-<input type="checkbox" onclick="showhide(23, this);" checked="checked" /> <%= I18n.t(:label_ratio_from_overall_budget) %><br/>
+<input type="checkbox" onclick="showhide(23, this);" /> <%= I18n.t(:label_ratio_from_overall_budget) %><br/>
 <input type="checkbox" onclick="showhide(25, this);" checked="checked" /> <%= CostObject.human_attribute_name(:budget_ratio) %><br/>
 
-<% end -%>
+<% end %>
